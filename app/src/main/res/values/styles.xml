@@ -1,11 +1,29 @@
 <resources>
 
+    <style name="AppThemeBase" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@color/background_activity</item>
+    </style>
+
+    <style name="AppThemeBase.BrandedLaunchHome">
+        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="AppThemeBase">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="android:textColorSecondary">@color/secondaryText</item>
+        <item name="android:textColorPrimary">@color/primaryText</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+
     </style>
+
+    <style name="mdtp_ActionButton.Text" parent="Widget.MaterialComponents.Button.TextButton.Dialog"/>
+
 
 </resources>

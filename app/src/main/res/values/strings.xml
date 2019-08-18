@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">Round up</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="exception_generic_message">There was an application error</string>
+    <string name="text_empty_list_generic">Empty</string>
+    <string name="retry_button">Retry</string>
+    <string name="text_select_date">Select date</string>
+    <string name="text_from">From</string>
+    <string name="text_to">To</string>
+    <string name="target">Target</string>
+    <string name="text_ok">Ok</string>
+    <string name="text_cancle">Cancel</string>
+    <string name="text_savings_complete">Savings Complete</string>
+    <string name="text_title_send_savings_goal">You have %s %s\nSelect your savings goal to send the money</string>
+    <string name="text_name">Name</string>
+    <string name="text_name_title_dialog">Name for your savings goal</string>
+    <string name="text_currency_accounts">Currency accounts</string>
+    <string name="text_savings_goal">Savings goal</string>
+    <string name="text_transactions">Transactions</string>
+    <string name="text_info_savings">It will round up money from every transaction IN or OUT</string>
 </resources>
