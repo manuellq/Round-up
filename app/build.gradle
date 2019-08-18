@@ -1,34 +1,171 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion build_versions.target_sdk
+    flavorDimensions "default"
     defaultConfig {
-        applicationId "com.mlcorrea.roundup"
-        minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+
+        versionCode build_versions.version_code
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+
     buildTypes {
+        debug {
+            minifyEnabled false
+            testCoverageEnabled true
+            debuggable true //good to have it. it is usefull for butterKnife
+            applicationIdSuffix ".debug"
+            splits.density.enable = false
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        disable 'InvalidPackage'
+        htmlReport true
+        htmlOutput file("build/reports/lint-report.html")
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+        ignoreWarnings false
+        disable 'InvalidPackage'            //Some libraries have issues with this.
+        disable 'OldTargetApi'              //Lint gives this warning but SDK 20 would be Android L Beta.
+        disable 'IconDensities'             //For testing purpose. This is safe to remove.
+        disable 'IconMissingDensityFolder'  //For testing purpose. This is safe to remove.
+    }
+
+    productFlavors {
+        live {
+            applicationId build_versions.application_id
+            versionName build_versions.version_code_name
+
+            buildConfigField("String", "BASE_URL", '"https://api-sandbox.starlingbank.com/"')
+            buildConfigField("String", "ACCESS_TOKEN", '"Bearer 5KqS59YLj2dVexnC2Ci1matfXbq27ypm26ECcczerhkli5NatFqMKK5ht29tG01M"')
+        }
+    }
+
+
+    // Remove mockRelease as it's not needed.
+    android.variantFilter { variant ->
+        if (variant.buildType.name == 'release'
+                && variant.flavors[0].name == 'mock') {
+            variant.ignore = true
+        }
+    }
+
+    testOptions.unitTests.all {
+
+        // Always show the result of every unit test, even if it passes.
+        testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        }
+    }
+
+    //Enforces Gradle to only compile the version number you state for
+    //all dependencies, no matter which version number the dependencies have stated.
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:2.0.1'
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.core:core-ktx:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation project(':data')
+    implementation project(':domain')
+
+    //kotlin
+    implementation deps.kotlin.stdlib_java
+    //google libraries
+    implementation deps.support.app_compat
+    implementation deps.support.recyclerview
+    implementation deps.support.cardview
+    implementation deps.support.design
+    implementation deps.support.ktx_core
+    implementation deps.support.palette
+    implementation deps.constraint_layout
+    //Google lifecycle
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    kapt deps.lifecycle.compiler
+    implementation deps.lifecycle.extensions
+    //Koin DI
+    implementation deps.koin
+    //kotlin libraries
+    implementation deps.kotlin.anko_commons
+    implementation deps.kotlin.anko_design
+    implementation deps.kotlin.anko_app_compat
+    //RxJava/RxAndroid/RxBinding
+    implementation(deps.rxjava.rx_android, {
+        exclude group: 'io.reactivex.rxjava2'
+    })
+    implementation(deps.rx_binding.rx_binding2, {
+        exclude group: 'io.reactivex.rxjava2'
+    })
+    implementation(deps.rx_binding.rx_appcompat, {
+        exclude group: 'io.reactivex.rxjava2'
+    })
+    //Retrofit
+    implementation(deps.retrofit.runtime) {
+        exclude group: 'com.squareup.okio:okio'
+    }
+    implementation deps.retrofit.moshi
+    implementation(deps.okhttp_logging_interceptor) {
+        exclude group: 'com.squareup.okio:okio'
+    }
+    implementation(deps.retrofit.adapter_RXJava, {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'io.reactivex.rxjava2'
+    })
+    implementation(deps.retrofit.moshi) {
+        exclude group: 'com.squareup.moshi'
+    }
+    //Network tools
+    implementation(deps.facebook_stetho, {
+        exclude group: 'com.squareup.okhttp3'
+    })
+    //Tools
+    debugImplementation deps.leak_canary.debug
+    releaseImplementation deps.leak_canary.release
+    kapt deps.butter_knife_compiler
+    implementation deps.butter_kinfe
+    implementation deps.timber
+    implementation deps.layout_shimmer
+    implementation('com.wdullaer:materialdatetimepicker:4.2.1') {
+        exclude group: 'androidx.appcompat'
+        exclude group: 'androidx.recyclerview'
+    }
+    implementation 'com.afollestad.material-dialogs:core:3.1.0'
+    implementation 'com.afollestad.material-dialogs:input:3.1.0'
+
+    //Testing Implementation
+    testImplementation deps.junit
+    testImplementation deps.mockk
+    testImplementation deps.truth
+    testImplementation(deps.roboelectric, {
+        exclude group: 'com.android.support'
+    })
+    testImplementation "androidx.arch.core:core-testing:2.0.1"
+
+
+    //Testing test Implementation
+    androidTestImplementation(deps.truth) {
+        exclude group: 'com.google.guava'
+    }
+    androidTestImplementation deps.runner
+    androidTestImplementation deps.rules
+    androidTestImplementation deps.espresso.core
 }

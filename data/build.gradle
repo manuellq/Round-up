@@ -1,0 +1,32 @@
+apply plugin: 'java-library'
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+sourceSets {
+    test.java.srcDirs += 'src/test/kotlin'
+}
+
+dependencies {
+    implementation project(':domain')
+    //Kotlin
+    implementation deps.kotlin.stdlib_java
+    //Moshi Serialization
+    kapt deps.moshi.moshi_codegen
+    api deps.moshi.moshi_core
+
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation 'org.slf4j:slf4j-simple:1.7.25'
+    // Dependencies for local unit tests
+    testImplementation deps.junit
+    testImplementation deps.mockk
+    testImplementation (deps.truth)
+}
